@@ -1,4 +1,4 @@
-﻿var downloadLink = "https://github.com/indi131/PasswordGenerator/raw/main/dist/password-generator.crx";
+﻿var downloadLink = "https://github.com/indi131/PasswordGenerator/raw/main/dist/password-generator.zip";
 
 var demoPassword = document.getElementById("demoPassword");
 var demoCopyBtn = document.getElementById("demoCopyBtn");
@@ -69,3 +69,4 @@ document.querySelectorAll("a[href^=\"#\"]").forEach(function(a) {
     if (el) { e.preventDefault(); el.scrollIntoView({ behavior: "smooth", block: "start" }); }
   });
 });
+
