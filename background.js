@@ -1,41 +1,40 @@
 chrome.tabs.onActivated.addListener(activeInfo => {
-  updateBadge(activeInfo.tabId);
+  updateIcon(activeInfo.tabId);
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.url) updateBadgeForTab(tabId, changeInfo.url);
+  if (changeInfo.url) updateIconForTab(tabId, changeInfo.url);
 });
 
-function updateBadge(tabId) {
+function updateIcon(tabId) {
   chrome.tabs.get(tabId, tab => {
-    if (tab && tab.url) updateBadgeForTab(tabId, tab.url);
+    if (tab && tab.url) updateIconForTab(tabId, tab.url);
   });
 }
 
-function updateBadgeForTab(tabId, url) {
+function updateIconForTab(tabId, url) {
   try {
     const hostname = new URL(url).hostname;
-    if (!hostname) { clearBadge(tabId); return; }
+    if (!hostname) { setDefaultIcon(tabId); return; }
     chrome.storage.local.get(["pgSites"], result => {
       const sites = result.pgSites || {};
       if (sites[hostname] && sites[hostname].password) {
-        chrome.action.setBadgeText({ text: "\u2022", tabId });
-        chrome.action.setBadgeBackgroundColor({ color: "#f97316", tabId });
+        chrome.action.setIcon({ path: "icons/icon-active.svg", tabId });
       } else {
-        clearBadge(tabId);
+        setDefaultIcon(tabId);
       }
     });
   } catch {
-    clearBadge(tabId);
+    setDefaultIcon(tabId);
   }
 }
 
-function clearBadge(tabId) {
-  chrome.action.setBadgeText({ text: "", tabId });
+function setDefaultIcon(tabId) {
+  chrome.action.setIcon({ path: "icons/icon.svg", tabId });
 }
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-    if (tabs[0]) updateBadge(tabs[0].id);
+    if (tabs[0]) updateIcon(tabs[0].id);
   });
 });

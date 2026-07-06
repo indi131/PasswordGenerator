@@ -12,7 +12,9 @@ New-Item -ItemType Directory -Path $tmp -Force | Out-Null
 $files = @("manifest.json","popup.html","popup.css","popup.js","background.js","common.css","options.html","options.css","options.js","history.html","history.css","history.js")
 foreach ($f in $files) { Copy-Item (Join-Path $root $f) (Join-Path $tmp $f) }
 New-Item -ItemType Directory -Path (Join-Path $tmp "icons") -Force | Out-Null
-Copy-Item (Join-Path $root "icons\icon.svg") (Join-Path $tmp "icons\icon.svg")
+foreach ($f in @("icon.svg","icon-active.svg")) {
+  Copy-Item (Join-Path $root "icons\$f") (Join-Path $tmp "icons\$f")
+}
 
 Write-Host "Creating ZIP..." -ForegroundColor Yellow
 Add-Type -AssemblyName System.IO.Compression.FileSystem
