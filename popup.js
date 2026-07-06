@@ -20,6 +20,7 @@ const $ = id => document.getElementById(id);
 const passwordEl = $("password");
 const refreshBtn = $("refreshBtn");
 const copyBtn = $("copyBtn");
+const saveBtn = $("saveBtn");
 const lengthInput = $("lengthInput");
 const lengthSlider = $("lengthSlider");
 const uppercaseCheck = $("uppercase");
@@ -66,11 +67,12 @@ function getSavedSitePassword(host) {
   } catch { return null; }
 }
 
-function saveSitePassword(host, password, length, charsetSize) {
+function saveSitePassword(host, password) {
   if (!host) return;
   try {
     const sites = JSON.parse(localStorage.getItem(STORAGE_KEYS.SITES) || "{}");
-    sites[host] = { password, length, charsetSize, date: Date.now() };
+    const existing = sites[host] || {};
+    sites[host] = { password, length: existing.length || password.length, charsetSize: existing.charsetSize || 62, date: Date.now() };
     localStorage.setItem(STORAGE_KEYS.SITES, JSON.stringify(sites));
   } catch {}
 }
@@ -81,7 +83,7 @@ function showSite(host) {
   siteBadgeText.textContent = host;
 }
 
-/* ─── History (only save here, view is separate window) ─── */
+/* ─── History ─── */
 
 function getHistory() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || "[]"); }
@@ -90,10 +92,40 @@ function getHistory() {
 
 function addToHistory(password, length, charsetSize, host) {
   const history = getHistory();
-  history.unshift({ password, length, charsetSize, host: host || "", date: Date.now() });
+  history.unshift({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    password,
+    length,
+    charsetSize,
+    host: host || "",
+    date: Date.now()
+  });
   if (history.length > 20) history.pop();
   localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(history));
 }
+
+/* ─── Save (password manager) ─── */
+
+function saveCurrentPassword() {
+  const pw = passwordEl.value;
+  if (!pw) return;
+
+  addToHistory(pw, pw.length, 62, currentHost);
+  if (currentHost) saveSitePassword(currentHost, pw);
+
+  saveBtn.classList.add("saved");
+  saveBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Сохранено';
+  setTimeout(() => {
+    saveBtn.classList.remove("saved");
+    saveBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Сохранить пароль';
+  }, 2000);
+}
+
+saveBtn.addEventListener("click", saveCurrentPassword);
+
+passwordEl.addEventListener("keydown", e => {
+  if (e.key === "Enter") saveCurrentPassword();
+});
 
 /* ─── Aliases ─── */
 
@@ -206,7 +238,7 @@ function getCharset() {
   return chars;
 }
 
-function generatePassword(saveForSite) {
+function generatePassword() {
   const charset = getCharset();
   const length = parseInt(lengthInput.value) || 10;
 
@@ -224,9 +256,7 @@ function generatePassword(saveForSite) {
 
   addToHistory(password, length, charset.length, currentHost);
 
-  if (saveForSite !== false && currentHost) {
-    saveSitePassword(currentHost, password, length, charset.length);
-  }
+  if (currentHost) saveSitePassword(currentHost, password);
 }
 
 function updateStrength(charsetSize, length) {

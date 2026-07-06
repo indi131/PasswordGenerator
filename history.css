@@ -30,8 +30,8 @@
 
 .history-item {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: stretch;
+  gap: 8px;
   padding: 12px 14px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -39,11 +39,15 @@
   transition: all 0.15s ease;
 }
 
-.history-item:hover { border-color: var(--primary); background: var(--surface-hover); }
+.history-item:hover { border-color: var(--border-hover); }
 
 .history-item-main {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
 }
 
 .history-item-pw {
@@ -55,15 +59,35 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  padding: 2px 0;
+}
+
+.history-item-edit-input {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg);
+  border: 1.5px solid var(--primary);
+  border-radius: 6px;
+  padding: 5px 8px;
+  outline: none;
+  width: 100%;
+  letter-spacing: 0.5px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.history-item-edit-input:focus {
+  box-shadow: 0 0 0 3px var(--primary-glow);
 }
 
 .history-item-meta {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 3px;
   font-size: 11px;
   color: var(--text-muted);
+  flex-wrap: wrap;
 }
 
 .history-item-site {
@@ -71,26 +95,40 @@
   color: var(--primary);
   padding: 1px 7px;
   border-radius: 4px;
-  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 180px;
 }
 
-.history-item-copy {
-  width: 32px;
-  height: 32px;
+.history-item-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.history-item-btn {
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   background: transparent;
   color: var(--text-muted);
-  border-radius: 7px;
+  border-radius: 6px;
+  cursor: pointer;
   transition: all 0.15s ease;
-  flex-shrink: 0;
 }
 
-.history-item-copy:hover { background: var(--primary); color: #fff; }
-.history-item-copy.copied { background: var(--success); color: #fff; }
+.history-item-btn.edit:hover { background: var(--primary); color: #fff; }
+.history-item-btn.copy:hover { background: var(--primary); color: #fff; }
+.history-item-btn.copy.copied { background: var(--success); color: #fff; }
+.history-item-btn.save { background: var(--success); color: #fff; }
+.history-item-btn.save:hover { background: #16a34a; }
+.history-item-btn.cancel { background: #f1f5f9; color: #64748b; }
+body.dark .history-item-btn.cancel { background: #334155; color: #94a3b8; }
+.history-item-btn.cancel:hover { background: #fee2e2; color: #ef4444; }
+body.dark .history-item-btn.cancel:hover { background: rgba(239, 68, 68, 0.2); color: #f87171; }
