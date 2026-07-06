@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Password Generator — расширение для Chrome</title>
+  <meta name="description" content="Красивый и удобный генератор безопасных паролей для Google Chrome. Настройка символов, оценка надёжности, тёмная тема, история паролей.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%236366f1%22><rect x=%223%22 y=%2211%22 width=%2218%22 height=%2211%22 rx=%222%22/><path d=%22M7 11V7a5 5 0 0 1 10 0v4%22/></svg>">
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+    </svg>
+    Password Generator
+  </a>
+  <div class="nav-links">
+    <a href="#features">Возможности</a>
+    <a href="#install">Установка</a>
+    <a href="https://github.com/indi131/PasswordGenerator" target="_blank">GitHub</a>
+    <a href="https://github.com/indi131/PasswordGenerator/raw/main/dist/password-generator.crx" class="nav-btn">Скачать</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-icon">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+    </svg>
+  </div>
+  <h1>Генератор <span>надёжных паролей</span> для Chrome</h1>
+  <p>Мгновенно создавайте безопасные пароли с гибкими настройками. Контролируйте состав символов, длину и оценку надёжности.</p>
+  <div class="hero-buttons">
+    <a href="https://github.com/indi131/PasswordGenerator/raw/main/dist/password-generator.crx" class="btn-primary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+      Установить расширение
+    </a>
+    <a href="#features" class="btn-secondary">Подробнее</a>
+  </div>
+</section>
+
+<!-- Demo -->
+<div class="demo">
+  <div class="demo-card">
+    <div class="demo-header">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <h2 id="demoTitle">Хороший</h2>
+    </div>
+    <div class="demo-pw-box">
+      <input type="text" id="demoPassword" readonly value="nH25zPQoB3">
+      <button class="demo-refresh" id="demoRefresh" title="Сгенерировать">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      </button>
+      <button class="demo-btn" id="demoCopyBtn">КОПИРОВАТЬ</button>
+    </div>
+    <div class="demo-row">
+      <label>Длина пароля</label>
+      <input type="number" id="demoLength" value="10" min="4" max="64">
+      <input type="range" class="demo-slider" id="demoSlider" min="4" max="64" value="10">
+    </div>
+    <div class="demo-options">
+      <div class="demo-opt"><span class="check"></span> Верхний регистр</div>
+      <div class="demo-opt"><span class="check"></span> Нижний регистр</div>
+      <div class="demo-opt"><span class="check"></span> Цифры</div>
+      <div class="demo-opt"> Символы</div>
+    </div>
+    <div class="demo-bar"><div class="demo-bar-fill" id="demoBar"></div></div>
+  </div>
+</div>
+
+<!-- Features -->
+<section class="section" id="features">
+  <h2 class="section-title">Все возможности</h2>
+  <p class="section-sub">Всё что нужно для создания и управления паролями — в одном расширении</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <h3>Гибкая настройка</h3>
+      <p>Выбирайте какие символы использовать: заглавные, строчные буквы, цифры и спецсимволы.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <h3>Оценка надёжности</h3>
+      <p>5 уровней оценки от «Плохой» до «Невероятный» с наглядной цветовой шкалой.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </div>
+      <h3>Тёмная тема</h3>
+      <p>Автоматически подстраивается под системные настройки или переключается вручную.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </div>
+      <h3>Автокопирование</h3>
+      <p>Пароль автоматически копируется в буфер обмена сразу после генерации.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <h3>История паролей</h3>
+      <p>Последние 20 паролей сохраняются с указанием сайта и времени создания.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      </div>
+      <h3>Привязка к сайту</h3>
+      <p>Для каждого сайта запоминается свой пароль. При повторном открытии пароль восстанавливается.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Install -->
+<section class="section" id="install">
+  <h2 class="section-title">Установка за 30 секунд</h2>
+  <p class="section-sub">Всё что нужно — скачать файл и перетащить в браузер</p>
+
+  <div class="install-grid">
+    <div class="install-step">
+      <div class="install-step-num">1</div>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <h4>Скачайте</h4>
+      <p>Нажмите кнопку «Установить» — файл .crx сохранится на компьютер</p>
+    </div>
+    <div class="install-step">
+      <div class="install-step-num">2</div>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <h4>Откройте</h4>
+      <p>Перейдите на страницу <code>chrome://extensions/</code></p>
+    </div>
+    <div class="install-step">
+      <div class="install-step-num">3</div>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+      <h4>Перетащите</h4>
+      <p>Перетащите .crx файл в окно браузера на странице расширений</p>
+    </div>
+    <div class="install-step">
+      <div class="install-step-num">4</div>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <h4>Готово</h4>
+      <p>Нажмите «Добавить расширение» и пользуйтесь</p>
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-top: 32px;">
+    <a href="https://github.com/indi131/PasswordGenerator/raw/main/dist/password-generator.crx" class="btn-primary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+      Скачать Password Generator
+    </a>
+  </div>
+</section>
+
+<footer>
+  <p>
+    <a href="https://github.com/indi131/PasswordGenerator">Password Generator</a>
+    &nbsp;·&nbsp; v1.0.0 &nbsp;·&nbsp;
+    <a href="https://github.com/indi131/PasswordGenerator/blob/main/README.md">README</a>
+  </p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
