@@ -9,12 +9,10 @@ Write-Host "=== Password Generator - Build ===" -ForegroundColor Cyan
 if (Test-Path $dist) { Remove-Item -Recurse -Force $dist }
 New-Item -ItemType Directory -Path $tmp -Force | Out-Null
 
-$files = @("manifest.json","popup.html","popup.css","popup.js")
+$files = @("manifest.json","popup.html","popup.css","popup.js","background.js","common.css","options.html","options.css","options.js","history.html","history.css","history.js")
 foreach ($f in $files) { Copy-Item (Join-Path $root $f) (Join-Path $tmp $f) }
 New-Item -ItemType Directory -Path (Join-Path $tmp "icons") -Force | Out-Null
-foreach ($f in @("icon16.png","icon32.png","icon48.png","icon128.png")) {
-  Copy-Item (Join-Path $root "icons\$f") (Join-Path $tmp "icons\$f")
-}
+Copy-Item (Join-Path $root "icons\icon.svg") (Join-Path $tmp "icons\icon.svg")
 
 Write-Host "Creating ZIP..." -ForegroundColor Yellow
 Add-Type -AssemblyName System.IO.Compression.FileSystem

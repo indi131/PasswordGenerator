@@ -74,7 +74,22 @@ function saveSitePassword(host, password) {
     const existing = sites[host] || {};
     sites[host] = { password, length: existing.length || password.length, charsetSize: existing.charsetSize || 62, date: Date.now() };
     localStorage.setItem(STORAGE_KEYS.SITES, JSON.stringify(sites));
+    chrome.storage.local.set({ pgSites: sites });
   } catch {}
+}
+
+function setBadge(host) {
+  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+    if (!tabs[0]) return;
+    const tabId = tabs[0].id;
+    if (host && getSavedSitePassword(host)) {
+      chrome.action.setBadgeText({ text: "\u2713", tabId });
+      chrome.action.setBadgeBackgroundColor({ color: "#22c55e", tabId });
+      chrome.action.setBadgeTextColor({ color: "#ffffff", tabId });
+    } else {
+      chrome.action.setBadgeText({ text: "", tabId });
+    }
+  });
 }
 
 function showSite(host) {
@@ -333,6 +348,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
       currentHost = url.hostname;
       showSite(currentHost);
       checkAliases(tabs[0].url, currentHost);
+      setBadge(currentHost);
 
       const saved = getSavedSitePassword(currentHost);
       if (saved && saved.password) {
