@@ -265,9 +265,10 @@ function generatePassword() {
   passwordEl.value = password;
   updateStrength(charset.length, length);
 
-  if (autoCopyToggle.checked) copyToClipboard(password).then(() => showCopyIndicator());
-
-  addToHistory(password, length, charset.length, currentHost);
+  if (autoCopyToggle.checked) {
+    addToHistory(password, length, charset.length, currentHost);
+    copyToClipboard(password).then(() => showCopyIndicator());
+  }
 
   if (currentHost) saveSitePassword(currentHost, password);
 }
@@ -321,7 +322,11 @@ refreshBtn.addEventListener("click", () => {
 });
 
 copyBtn.addEventListener("click", () => {
-  if (passwordEl.value) { copyToClipboard(passwordEl.value); showCopyIndicator(); }
+  if (passwordEl.value) {
+    addToHistory(passwordEl.value, passwordEl.value.length, 62, currentHost);
+    copyToClipboard(passwordEl.value);
+    showCopyIndicator();
+  }
 });
 
 [uppercaseCheck, lowercaseCheck, numbersCheck, symbolsCheck].forEach(cb => {
