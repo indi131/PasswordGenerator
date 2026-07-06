@@ -1,0 +1,96 @@
+.search-box {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.search-box input { padding-left: 38px; }
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.history-list::-webkit-scrollbar { width: 6px; }
+.history-list::-webkit-scrollbar-track { background: transparent; }
+.history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.history-list::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  transition: all 0.15s ease;
+}
+
+.history-item:hover { border-color: var(--primary); background: var(--surface-hover); }
+
+.history-item-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-item-pw {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 3px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.history-item-site {
+  background: var(--primary-glow);
+  color: var(--primary);
+  padding: 1px 7px;
+  border-radius: 4px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+
+.history-item-copy {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 7px;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.history-item-copy:hover { background: var(--primary); color: #fff; }
+.history-item-copy.copied { background: var(--success); color: #fff; }

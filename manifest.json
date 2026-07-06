@@ -4,6 +4,12 @@
   "version": "1.0.0",
   "description": "Генератор безопасных паролей с настройками",
   "permissions": ["activeTab"],
+  "web_accessible_resources": [
+    {
+      "resources": ["options.html", "history.html"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {

@@ -31,21 +31,11 @@ const strengthBar = $("strengthBar");
 const strengthValue = $("strengthValue");
 const themeBtn = $("themeBtn");
 const historyBtn = $("historyBtn");
-const historyPanel = $("historyPanel");
-const historyList = $("historyList");
-const historyEmpty = $("historyEmpty");
-const clearHistoryBtn = $("clearHistoryBtn");
+const settingsBtn = $("settingsBtn");
 const autoCopyToggle = $("autoCopyToggle");
 const copyIndicator = $("copyIndicator");
 const siteBadge = $("siteBadge");
 const siteBadgeText = $("siteBadgeText");
-const settingsBtn = $("settingsBtn");
-const settingsPanel = $("settingsPanel");
-const aliasPattern = $("aliasPattern");
-const aliasHost = $("aliasHost");
-const aliasAddBtn = $("aliasAddBtn");
-const aliasList = $("aliasList");
-const aliasEmpty = $("aliasEmpty");
 const aliasNotify = $("aliasNotify");
 const aliasNotifyLabel = $("aliasNotifyLabel");
 const aliasNotifyPw = $("aliasNotifyPw");
@@ -91,113 +81,92 @@ function showSite(host) {
   siteBadgeText.textContent = host;
 }
 
-/* ─── Aliases ─── */
+/* ─── History (only save here, view is separate window) ─── */
 
-function getAliases() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.ALIASES) || "[]"); }
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || "[]"); }
   catch { return []; }
 }
 
-function saveAliases(aliases) {
-  localStorage.setItem(STORAGE_KEYS.ALIASES, JSON.stringify(aliases));
+function addToHistory(password, length, charsetSize, host) {
+  const history = getHistory();
+  history.unshift({ password, length, charsetSize, host: host || "", date: Date.now() });
+  if (history.length > 20) history.pop();
+  localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(history));
 }
 
-function addAlias(pattern, hostname) {
-  const aliases = getAliases();
-  aliases.push({ pattern, hostname });
-  saveAliases(aliases);
-  renderAliases();
+/* ─── Aliases ─── */
+
+function normalizeAlias(item) {
+  if (typeof item === "string") return item;
+  if (item && typeof item.pattern === "string") return item.pattern;
+  return "";
 }
 
-function deleteAlias(index) {
-  const aliases = getAliases();
-  aliases.splice(index, 1);
-  saveAliases(aliases);
-  renderAliases();
+function getAliases() {
+  let list;
+  try { list = JSON.parse(localStorage.getItem(STORAGE_KEYS.ALIASES) || "[]"); }
+  catch { list = []; }
+  return list.map(normalizeAlias).filter(function(p) { return p.length > 0; });
 }
 
-function renderAliases() {
-  const aliases = getAliases();
-  aliasList.innerHTML = "";
-
-  if (aliases.length === 0) {
-    aliasEmpty.style.display = "block";
-    return;
+function findPasswordForHost(hostname) {
+  const saved = getSavedSitePassword(hostname);
+  if (saved && saved.password) return saved.password;
+  const history = getHistory();
+  for (let i = 0; i < history.length; i++) {
+    if (history[i].host === hostname && history[i].password) return history[i].password;
   }
-  aliasEmpty.style.display = "none";
+  return null;
+}
 
-  aliases.forEach(function(item, i) {
-    const div = document.createElement("div");
-    div.className = "alias-item";
-    div.innerHTML =
-      "<span class=\"alias-item-pattern\">" + escapeHtml(item.pattern) + "</span>" +
-      "<span class=\"alias-item-arrow\">\u2192</span>" +
-      "<span class=\"alias-item-host\" title=\"" + escapeHtml(item.hostname) + "\">" + escapeHtml(item.hostname) + "</span>";
-    const delBtn = document.createElement("button");
-    delBtn.className = "alias-item-del";
-    delBtn.title = "Удалить";
-    delBtn.textContent = "\u00d7";
-    delBtn.addEventListener("click", function() { deleteAlias(i); });
-    div.appendChild(delBtn);
-    aliasList.appendChild(div);
+function checkAliases(url, hostname) {
+  if (!url || !hostname) { aliasNotify.style.display = "none"; return; }
+  const aliases = getAliases();
+  let triggered = false;
+  for (let i = 0; i < aliases.length; i++) {
+    if (aliases[i] && url.indexOf(aliases[i]) !== -1) { triggered = true; break; }
+  }
+  if (!triggered) { aliasNotify.style.display = "none"; return; }
+
+  const pw = findPasswordForHost(hostname);
+  if (pw) {
+    aliasNotifyLabel.textContent = "Вы генерировали пароль для " + hostname + ":";
+    aliasNotifyPw.textContent = pw;
+    aliasNotify.style.display = "flex";
+  } else {
+    aliasNotify.style.display = "none";
+  }
+}
+
+aliasNotifyClose.addEventListener("click", () => { aliasNotify.style.display = "none"; });
+
+aliasNotifyCopy.addEventListener("click", () => {
+  if (aliasNotifyPw.textContent) copyToClipboard(aliasNotifyPw.textContent);
+});
+
+/* ─── Open windows ─── */
+
+function openOptionsWindow() {
+  chrome.windows.create({
+    url: chrome.runtime.getURL("options.html"),
+    type: "popup",
+    width: 480,
+    height: 620
   });
 }
 
-function escapeHtml(str) {
-  const el = document.createElement("span");
-  el.textContent = str;
-  return el.innerHTML;
+function openHistoryWindow() {
+  chrome.windows.create({
+    url: chrome.runtime.getURL("history.html"),
+    type: "popup",
+    width: 520,
+    height: 640
+  });
 }
 
-aliasAddBtn.addEventListener("click", function() {
-  const pattern = aliasPattern.value.trim();
-  const hostname = aliasHost.value.trim();
-  if (!pattern || !hostname) return;
-  addAlias(pattern, hostname);
-  aliasPattern.value = "";
-  aliasHost.value = "";
-});
-
-aliasHost.addEventListener("keydown", function(e) {
-  if (e.key === "Enter") aliasAddBtn.click();
-});
-
-aliasPattern.addEventListener("keydown", function(e) {
-  if (e.key === "Enter") aliasAddBtn.click();
-});
-
-settingsBtn.addEventListener("click", function() {
-  settingsPanel.classList.toggle("open");
-  historyPanel.classList.remove("open");
-  if (settingsPanel.classList.contains("open")) renderAliases();
-});
-
-aliasNotifyClose.addEventListener("click", function() {
-  aliasNotify.style.display = "none";
-});
-
-aliasNotifyCopy.addEventListener("click", function() {
-  if (aliasNotifyPw.textContent) {
-    copyToClipboard(aliasNotifyPw.textContent);
-  }
-});
-
-function checkAliases(url, hostname) {
-  if (!url) return;
-  const aliases = getAliases();
-  for (let i = 0; i < aliases.length; i++) {
-    if (!aliases[i].pattern) continue;
-    if (url.indexOf(aliases[i].pattern) === -1) continue;
-    const saved = getSavedSitePassword(aliases[i].hostname);
-    if (saved && saved.password) {
-      aliasNotifyLabel.textContent = "\u0412\u044b \u0433\u0435\u043d\u0435\u0440\u0438\u0440\u043e\u0432\u0430\u043b\u0438 \u043f\u0430\u0440\u043e\u043b\u044c \u0434\u043b\u044f " + aliases[i].hostname + ":";
-      aliasNotifyPw.textContent = saved.password;
-      aliasNotify.style.display = "flex";
-      return;
-    }
-  }
-  aliasNotify.style.display = "none";
-}
+settingsBtn.addEventListener("click", openOptionsWindow);
+historyBtn.addEventListener("click", openHistoryWindow);
 
 /* ─── Auto copy ─── */
 
@@ -225,82 +194,6 @@ function copyToClipboard(text) {
     }, 1500);
   });
 }
-
-/* ─── History ─── */
-
-function getHistory() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || "[]"); }
-  catch { return []; }
-}
-
-function saveHistory(history) {
-  localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(history));
-}
-
-function addToHistory(password, length, charsetSize, host) {
-  const history = getHistory();
-  history.unshift({ password, length, charsetSize, host: host || "", date: Date.now() });
-  if (history.length > 20) history.pop();
-  saveHistory(history);
-  if (historyPanel.classList.contains("open")) renderHistory();
-}
-
-function clearHistory() {
-  saveHistory([]);
-  renderHistory();
-}
-
-function renderHistory() {
-  const history = getHistory();
-  historyList.innerHTML = "";
-
-  if (history.length === 0) {
-    historyEmpty.style.display = "block";
-    return;
-  }
-  historyEmpty.style.display = "none";
-
-  history.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "history-item";
-
-    const pw = document.createElement("span");
-    pw.className = "history-item-pw";
-    pw.textContent = item.password;
-
-    const meta = document.createElement("span");
-    meta.className = "history-item-meta";
-    const d = new Date(item.date);
-    const time = d.toLocaleTimeString("ru", { hour: "2-digit", minute: "2-digit" });
-    meta.textContent = item.length + " " + String.fromCharCode(183) + " " + time;
-
-    const copyIcon = document.createElement("button");
-    copyIcon.className = "history-item-copy";
-    copyIcon.innerHTML = "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\" ry=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg>";
-    copyIcon.addEventListener("mousedown", e => { e.stopPropagation(); copyToClipboard(item.password); });
-
-    div.addEventListener("click", () => { passwordEl.value = item.password; copyToClipboard(item.password); });
-
-    div.appendChild(pw);
-    if (item.host) {
-      const hostEl = document.createElement("span");
-      hostEl.className = "history-item-site";
-      hostEl.textContent = item.host;
-      div.appendChild(hostEl);
-    }
-    div.appendChild(meta);
-    div.appendChild(copyIcon);
-    historyList.appendChild(div);
-  });
-}
-
-clearHistoryBtn.addEventListener("click", clearHistory);
-
-historyBtn.addEventListener("click", () => {
-  historyPanel.classList.toggle("open");
-  settingsPanel.classList.remove("open");
-  if (historyPanel.classList.contains("open")) renderHistory();
-});
 
 /* ─── Generate ─── */
 
@@ -344,7 +237,7 @@ function updateStrength(charsetSize, length) {
   else if (entropy < 40) { label = "Слабый";     value = "Слабая";        className = "fair";   width = "35%"; color = "#f59e0b"; }
   else if (entropy < 60) { label = "Хороший";    value = "Средняя";       className = "good";   width = "60%"; color = "#eab308"; }
   else if (entropy < 80) { label = "Отличный";   value = "Надёжная";      className = "strong"; width = "80%"; color = "#22c55e"; }
-  else                   { label = "Невероятный"; value = "Максимальная";  className = "strong"; width = "100%"; color = "#22c55e"; }
+  else                   { label = "Невероятный"; value = "Максимальная"; className = "strong"; width = "100%"; color = "#22c55e"; }
 
   strengthTitle.textContent = label;
   strengthTitle.className = "title " + className;

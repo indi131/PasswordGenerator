@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Настройки — Генератор паролей</title>
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <header>
+    <h1>Настройки алиасов</h1>
+  </header>
+
+  <p class="desc">Алиас — это часть URL (например <code>/administrator</code> или <code>/admin</code>). Если расширение видит алиас в адресе открытой страницы и для этого сайта уже генерировался пароль — появится напоминание с паролем.</p>
+
+  <form class="alias-form" id="aliasForm">
+    <input type="text" id="aliasPattern" placeholder="Алиас (например /admin)" autocomplete="off">
+    <button type="submit" id="aliasAddBtn">Добавить</button>
+  </form>
+
+  <div class="alias-section">
+    <div class="alias-section-title">Список алиасов</div>
+    <div class="alias-list" id="aliasList"></div>
+    <div class="empty" id="aliasEmpty">Нет алиасов. Добавьте первый выше.</div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>
