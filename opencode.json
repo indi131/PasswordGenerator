@@ -1,0 +1,25 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "skills": [
+    {
+      "name": "passgen-extension",
+      "description": "Chrome extension structure, storage, icons, popup, background service worker",
+      "location": "skills/extension.md"
+    },
+    {
+      "name": "passgen-build",
+      "description": "How to build and package the extension, icon generation via sharp",
+      "location": "skills/build.md"
+    },
+    {
+      "name": "passgen-landing",
+      "description": "GitHub Pages landing page structure, demo, publishing",
+      "location": "skills/landing-page.md"
+    },
+    {
+      "name": "passgen-icons",
+      "description": "Icon design, SVG sources, PNG generation, dynamic swap logic",
+      "location": "skills/icons.md"
+    }
+  ]
+}
