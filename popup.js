@@ -83,9 +83,15 @@ function setIconForHost(host) {
     if (!tabs[0]) return;
     const tabId = tabs[0].id;
     if (host && getSavedSitePassword(host)) {
-      chrome.action.setIcon({ path: "icons/icon-active.svg", tabId });
+      chrome.action.setIcon({
+        path: { "16": "icons/icon-active16.png", "32": "icons/icon-active32.png", "48": "icons/icon-active48.png", "128": "icons/icon-active128.png" },
+        tabId
+      });
     } else {
-      chrome.action.setIcon({ path: "icons/icon.svg", tabId });
+      chrome.action.setIcon({
+        path: { "16": "icons/icon16.png", "32": "icons/icon32.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
+        tabId
+      });
     }
   });
 }

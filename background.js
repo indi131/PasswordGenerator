@@ -19,7 +19,10 @@ function updateIconForTab(tabId, url) {
     chrome.storage.local.get(["pgSites"], result => {
       const sites = result.pgSites || {};
       if (sites[hostname] && sites[hostname].password) {
-        chrome.action.setIcon({ path: "icons/icon-active.svg", tabId });
+        chrome.action.setIcon({
+          path: { "16": "icons/icon-active16.png", "32": "icons/icon-active32.png", "48": "icons/icon-active48.png", "128": "icons/icon-active128.png" },
+          tabId
+        });
       } else {
         setDefaultIcon(tabId);
       }
@@ -30,7 +33,10 @@ function updateIconForTab(tabId, url) {
 }
 
 function setDefaultIcon(tabId) {
-  chrome.action.setIcon({ path: "icons/icon.svg", tabId });
+  chrome.action.setIcon({
+    path: { "16": "icons/icon16.png", "32": "icons/icon32.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
+    tabId
+  });
 }
 
 chrome.runtime.onInstalled.addListener(() => {
