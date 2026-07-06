@@ -1,0 +1,146 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Password Generator</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-left">
+        <button class="header-btn" id="themeBtn" title="Сменить тему" data-theme="light">
+          <svg class="theme-icon theme-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="theme-icon theme-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+      <svg class="lock-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg>
+      <h1 class="title" id="strengthTitle">Хороший</h1>
+      <div class="header-right">
+        <button class="header-btn" id="historyBtn" title="История паролей">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="site-badge" id="siteBadge" style="display:none">
+      <svg class="site-badge-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="2" y1="12" x2="22" y2="12"></line>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+      </svg>
+      <span class="site-badge-text" id="siteBadgeText"></span>
+    </div>
+
+    <div class="password-box">
+      <input type="text" id="password" readonly>
+      <button class="icon-btn" id="refreshBtn" title="Сгенерировать заново">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <polyline points="1 20 1 14 7 14"></polyline>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+        </svg>
+      </button>
+      <button class="copy-btn" id="copyBtn">КОПИРОВАТЬ</button>
+    </div>
+
+    <div class="auto-copy-row">
+      <label class="switch-label">
+        <span class="switch">
+          <input type="checkbox" id="autoCopyToggle">
+          <span class="switch-slider"></span>
+        </span>
+        <span class="switch-text">Копировать автоматически</span>
+      </label>
+      <span class="copy-indicator" id="copyIndicator">Скопировано</span>
+    </div>
+
+    <div class="length-section">
+      <div class="length-header">
+        <label class="length-label">Длина пароля</label>
+        <input type="number" id="lengthInput" class="length-input" value="10" min="4" max="64">
+      </div>
+      <input type="range" id="lengthSlider" class="length-slider" min="4" max="64" value="10">
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="options-label">Включить в пароль</div>
+
+    <div class="checkboxes">
+      <label class="checkbox-label">
+        <input type="checkbox" id="uppercase" checked>
+        <span class="checkmark"></span>
+        <span class="checkbox-text">
+          <span class="checkbox-title">Верхний регистр</span>
+          <span class="checkbox-sub">A–Z</span>
+        </span>
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="lowercase" checked>
+        <span class="checkmark"></span>
+        <span class="checkbox-text">
+          <span class="checkbox-title">Нижний регистр</span>
+          <span class="checkbox-sub">a–z</span>
+        </span>
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="numbers" checked>
+        <span class="checkmark"></span>
+        <span class="checkbox-text">
+          <span class="checkbox-title">Цифры</span>
+          <span class="checkbox-sub">0–9</span>
+        </span>
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="symbols">
+        <span class="checkmark"></span>
+        <span class="checkbox-text">
+          <span class="checkbox-title">Символы</span>
+          <span class="checkbox-sub">!#$%&amp;*</span>
+        </span>
+      </label>
+    </div>
+
+    <div class="strength-section">
+      <div class="strength-header">
+        <span class="strength-label">Надёжность</span>
+        <span class="strength-value" id="strengthValue">Средняя</span>
+      </div>
+      <div class="strength-bar-container">
+        <div class="strength-bar" id="strengthBar"></div>
+      </div>
+    </div>
+
+    <div class="history-panel" id="historyPanel">
+      <div class="history-head">
+        <span class="history-title">История паролей</span>
+        <button class="history-clear" id="clearHistoryBtn">Очистить</button>
+      </div>
+      <div class="history-list" id="historyList"></div>
+      <div class="history-empty" id="historyEmpty">История пуста</div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
