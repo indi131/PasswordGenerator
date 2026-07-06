@@ -1,6 +1,6 @@
 ﻿{
   "manifest_version": 3,
-  "name": "Password Generator",
+  "name": "Генератор паролей",
   "version": "1.0.0",
   "description": "Генератор безопасных паролей с настройками",
   "permissions": ["activeTab"],

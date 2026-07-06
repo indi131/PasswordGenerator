@@ -9,7 +9,8 @@ const STORAGE_KEYS = {
   THEME: "pgTheme",
   AUTO_COPY: "pgAutoCopy",
   HISTORY: "pgHistory",
-  SITES: "pgSites"
+  SITES: "pgSites",
+  ALIASES: "pgAliases"
 };
 
 let currentHost = "";
@@ -38,6 +39,18 @@ const autoCopyToggle = $("autoCopyToggle");
 const copyIndicator = $("copyIndicator");
 const siteBadge = $("siteBadge");
 const siteBadgeText = $("siteBadgeText");
+const settingsBtn = $("settingsBtn");
+const settingsPanel = $("settingsPanel");
+const aliasPattern = $("aliasPattern");
+const aliasHost = $("aliasHost");
+const aliasAddBtn = $("aliasAddBtn");
+const aliasList = $("aliasList");
+const aliasEmpty = $("aliasEmpty");
+const aliasNotify = $("aliasNotify");
+const aliasNotifyLabel = $("aliasNotifyLabel");
+const aliasNotifyPw = $("aliasNotifyPw");
+const aliasNotifyCopy = $("aliasNotifyCopy");
+const aliasNotifyClose = $("aliasNotifyClose");
 
 /* ─── Theme ─── */
 
@@ -76,6 +89,114 @@ function showSite(host) {
   if (!host) { siteBadge.style.display = "none"; return; }
   siteBadge.style.display = "flex";
   siteBadgeText.textContent = host;
+}
+
+/* ─── Aliases ─── */
+
+function getAliases() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.ALIASES) || "[]"); }
+  catch { return []; }
+}
+
+function saveAliases(aliases) {
+  localStorage.setItem(STORAGE_KEYS.ALIASES, JSON.stringify(aliases));
+}
+
+function addAlias(pattern, hostname) {
+  const aliases = getAliases();
+  aliases.push({ pattern, hostname });
+  saveAliases(aliases);
+  renderAliases();
+}
+
+function deleteAlias(index) {
+  const aliases = getAliases();
+  aliases.splice(index, 1);
+  saveAliases(aliases);
+  renderAliases();
+}
+
+function renderAliases() {
+  const aliases = getAliases();
+  aliasList.innerHTML = "";
+
+  if (aliases.length === 0) {
+    aliasEmpty.style.display = "block";
+    return;
+  }
+  aliasEmpty.style.display = "none";
+
+  aliases.forEach(function(item, i) {
+    const div = document.createElement("div");
+    div.className = "alias-item";
+    div.innerHTML =
+      "<span class=\"alias-item-pattern\">" + escapeHtml(item.pattern) + "</span>" +
+      "<span class=\"alias-item-arrow\">\u2192</span>" +
+      "<span class=\"alias-item-host\" title=\"" + escapeHtml(item.hostname) + "\">" + escapeHtml(item.hostname) + "</span>";
+    const delBtn = document.createElement("button");
+    delBtn.className = "alias-item-del";
+    delBtn.title = "Удалить";
+    delBtn.textContent = "\u00d7";
+    delBtn.addEventListener("click", function() { deleteAlias(i); });
+    div.appendChild(delBtn);
+    aliasList.appendChild(div);
+  });
+}
+
+function escapeHtml(str) {
+  const el = document.createElement("span");
+  el.textContent = str;
+  return el.innerHTML;
+}
+
+aliasAddBtn.addEventListener("click", function() {
+  const pattern = aliasPattern.value.trim();
+  const hostname = aliasHost.value.trim();
+  if (!pattern || !hostname) return;
+  addAlias(pattern, hostname);
+  aliasPattern.value = "";
+  aliasHost.value = "";
+});
+
+aliasHost.addEventListener("keydown", function(e) {
+  if (e.key === "Enter") aliasAddBtn.click();
+});
+
+aliasPattern.addEventListener("keydown", function(e) {
+  if (e.key === "Enter") aliasAddBtn.click();
+});
+
+settingsBtn.addEventListener("click", function() {
+  settingsPanel.classList.toggle("open");
+  historyPanel.classList.remove("open");
+  if (settingsPanel.classList.contains("open")) renderAliases();
+});
+
+aliasNotifyClose.addEventListener("click", function() {
+  aliasNotify.style.display = "none";
+});
+
+aliasNotifyCopy.addEventListener("click", function() {
+  if (aliasNotifyPw.textContent) {
+    copyToClipboard(aliasNotifyPw.textContent);
+  }
+});
+
+function checkAliases(url, hostname) {
+  if (!url) return;
+  const aliases = getAliases();
+  for (let i = 0; i < aliases.length; i++) {
+    if (!aliases[i].pattern) continue;
+    if (url.indexOf(aliases[i].pattern) === -1) continue;
+    const saved = getSavedSitePassword(aliases[i].hostname);
+    if (saved && saved.password) {
+      aliasNotifyLabel.textContent = "\u0412\u044b \u0433\u0435\u043d\u0435\u0440\u0438\u0440\u043e\u0432\u0430\u043b\u0438 \u043f\u0430\u0440\u043e\u043b\u044c \u0434\u043b\u044f " + aliases[i].hostname + ":";
+      aliasNotifyPw.textContent = saved.password;
+      aliasNotify.style.display = "flex";
+      return;
+    }
+  }
+  aliasNotify.style.display = "none";
 }
 
 /* ─── Auto copy ─── */
@@ -177,6 +298,7 @@ clearHistoryBtn.addEventListener("click", clearHistory);
 
 historyBtn.addEventListener("click", () => {
   historyPanel.classList.toggle("open");
+  settingsPanel.classList.remove("open");
   if (historyPanel.classList.contains("open")) renderHistory();
 });
 
@@ -287,6 +409,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
       const url = new URL(tabs[0].url);
       currentHost = url.hostname;
       showSite(currentHost);
+      checkAliases(tabs[0].url, currentHost);
 
       const saved = getSavedSitePassword(currentHost);
       if (saved && saved.password) {
