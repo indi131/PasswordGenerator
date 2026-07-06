@@ -1,12 +1,18 @@
 ﻿$ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $dist = Join-Path $root "dist"
-$zip = Join-Path $dist "password-generator.zip"
+$crx = Join-Path $dist "password-generator.crx"
+$key = Join-Path $root "key.pem"
 
 Write-Host "=== Password Generator - Build ===" -ForegroundColor Cyan
 
+# 1. Prepare dist
 if (Test-Path $dist) { Remove-Item -Recurse -Force $dist }
 New-Item -ItemType Directory -Path $dist -Force | Out-Null
+
+# 2. Copy source files to temp directory
+$tmp = Join-Path $dist "extension"
+New-Item -ItemType Directory -Path $tmp -Force | Out-Null
 
 $files = @(
   "manifest.json",
@@ -19,9 +25,6 @@ $files = @(
   "icons/icon128.png"
 )
 
-$tmp = Join-Path $dist "tmp"
-New-Item -ItemType Directory -Path $tmp -Force | Out-Null
-
 foreach ($f in $files) {
   $src = Join-Path $root $f
   $dst = Join-Path $tmp $f
@@ -30,13 +33,21 @@ foreach ($f in $files) {
   Copy-Item -LiteralPath $src -Destination $dst
 }
 
-if (Test-Path $zip) { Remove-Item -Force $zip }
+# 3. Generate key if not exists
+if (-not (Test-Path $key)) {
+  Write-Host "Generating private key..." -ForegroundColor Yellow
+  npx crx keygen $root 2>&1 | Out-Null
+  Write-Host "  key.pem created" -ForegroundColor Green
+}
 
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-[System.IO.Compression.ZipFile]::CreateFromDirectory($tmp, $zip)
+# 4. Pack CRX
+Write-Host "Packing CRX..." -ForegroundColor Yellow
+npx crx pack $tmp -o $crx -p $key 2>&1 | Out-Null
 
+# 5. Clean up temp
 Remove-Item -Recurse -Force $tmp
 
-$len = (Get-Item $zip).Length
+# 6. Report
+$len = (Get-Item $crx).Length
 $kb = [math]::Round($len / 1KB, 1)
-Write-Host "Done! $zip ($kb KB)" -ForegroundColor Green
+Write-Host "Done! $crx ($kb KB)" -ForegroundColor Green
