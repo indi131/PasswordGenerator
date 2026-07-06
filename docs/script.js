@@ -1,11 +1,10 @@
-﻿var downloadLink = "https://github.com/indi131/PasswordGenerator/raw/main/dist/password-generator.zip";
-
-var demoPassword = document.getElementById("demoPassword");
+﻿var demoPassword = document.getElementById("demoPassword");
 var demoCopyBtn = document.getElementById("demoCopyBtn");
 var demoRefresh = document.getElementById("demoRefresh");
 var demoSlider = document.getElementById("demoSlider");
 var demoLength = document.getElementById("demoLength");
 var demoBar = document.getElementById("demoBar");
+var demoTitle = document.getElementById("demoTitle");
 
 var CHARS = {
   uppercase: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
@@ -14,9 +13,32 @@ var CHARS = {
   symbols: "!@#$%^&*()_+-=[]{}|;:,.<>?"
 };
 
+var demoOpts = document.querySelectorAll(".demo-opt");
+
+demoOpts.forEach(function(el) {
+  el.addEventListener("click", function() {
+    el.classList.toggle("checked");
+    generateDemo();
+  });
+});
+
+function getDemoCharset() {
+  var chars = "";
+  demoOpts.forEach(function(el) {
+    if (!el.classList.contains("checked")) return;
+    var text = el.textContent.trim();
+    if (text.indexOf("Верхний") === 0) chars += CHARS.uppercase;
+    else if (text.indexOf("Нижний") === 0) chars += CHARS.lowercase;
+    else if (text.indexOf("Цифры") === 0) chars += CHARS.numbers;
+    else if (text.indexOf("Символы") === 0) chars += CHARS.symbols;
+  });
+  if (chars.length === 0) chars = CHARS.lowercase;
+  return chars;
+}
+
 function generateDemo() {
+  var charset = getDemoCharset();
   var len = parseInt(demoLength.value) || 10;
-  var charset = CHARS.uppercase + CHARS.lowercase + CHARS.numbers;
   var pw = "";
   var arr = new Uint32Array(len);
   crypto.getRandomValues(arr);
@@ -27,14 +49,15 @@ function generateDemo() {
 
 function updateBar(length, size) {
   var entropy = length * Math.log2(size || 1);
-  var w, c;
-  if (entropy < 28)      { w = "16%"; c = "#ef4444"; }
-  else if (entropy < 40) { w = "35%"; c = "#f59e0b"; }
-  else if (entropy < 60) { w = "60%"; c = "#eab308"; }
-  else if (entropy < 80) { w = "80%"; c = "#22c55e"; }
-  else                   { w = "100%"; c = "#22c55e"; }
+  var w, c, label;
+  if (entropy < 28)      { label = "Плохой";      w = "16%"; c = "#ef4444"; }
+  else if (entropy < 40) { label = "Слабый";      w = "35%"; c = "#f59e0b"; }
+  else if (entropy < 60) { label = "Хороший";     w = "60%"; c = "#eab308"; }
+  else if (entropy < 80) { label = "Отличный";    w = "80%"; c = "#22c55e"; }
+  else                   { label = "Невероятный"; w = "100%"; c = "#22c55e"; }
   demoBar.style.width = w;
   demoBar.style.background = c;
+  demoTitle.textContent = label;
 }
 
 demoRefresh.addEventListener("click", generateDemo);
@@ -69,4 +92,3 @@ document.querySelectorAll("a[href^=\"#\"]").forEach(function(a) {
     if (el) { e.preventDefault(); el.scrollIntoView({ behavior: "smooth", block: "start" }); }
   });
 });
-
