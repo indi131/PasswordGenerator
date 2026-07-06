@@ -83,9 +83,8 @@ function setBadge(host) {
     if (!tabs[0]) return;
     const tabId = tabs[0].id;
     if (host && getSavedSitePassword(host)) {
-      chrome.action.setBadgeText({ text: "\u2713", tabId });
-      chrome.action.setBadgeBackgroundColor({ color: "#22c55e", tabId });
-      chrome.action.setBadgeTextColor({ color: "#ffffff", tabId });
+      chrome.action.setBadgeText({ text: "\u2022", tabId });
+      chrome.action.setBadgeBackgroundColor({ color: "#f97316", tabId });
     } else {
       chrome.action.setBadgeText({ text: "", tabId });
     }

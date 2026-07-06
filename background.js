@@ -19,9 +19,8 @@ function updateBadgeForTab(tabId, url) {
     chrome.storage.local.get(["pgSites"], result => {
       const sites = result.pgSites || {};
       if (sites[hostname] && sites[hostname].password) {
-        chrome.action.setBadgeText({ text: "\u2713", tabId });
-        chrome.action.setBadgeBackgroundColor({ color: "#22c55e", tabId });
-        chrome.action.setBadgeTextColor({ color: "#ffffff", tabId });
+        chrome.action.setBadgeText({ text: "\u2022", tabId });
+        chrome.action.setBadgeBackgroundColor({ color: "#f97316", tabId });
       } else {
         clearBadge(tabId);
       }
